@@ -18,7 +18,13 @@ write the checker. It was read only after a mismatch, to find the root cause.
 | Megapool voter share per node (RPIP-46) | 89 / 89 exact |
 | Smoothing-pool ETH per validator, given the attestation scores | 8,966 / 8,966 exact |
 
-The tree checks (L1 and L2) also pass for intervals 44–49. For 50–54, the only failure is F3.
+Every v11 interval so far (46–54) has a report in `reports/`. Across all nine:
+- the Merkle root matches the on-chain root, and every published proof verifies;
+- collateral RPL, `totalNodeWeight` and oDAO RPL are exact for every node;
+- voter share is exact for every node (50–54; there was none before 50);
+- per-validator SP ETH is exact given the scores.
+
+The remaining failures are F1 (50–54), F3 (50–54), and one open item in interval 46 (F5).
 
 ## F1. Megapool smoothing-pool commission is computed with the wrong bond when a megapool has queued validators
 
@@ -45,7 +51,18 @@ is then scored as if almost all of their capital were borrowed:
 The dollar amounts are small today because the queue is short and megapool SP income is small.
 The error grows with queue length.
 
-Per interval: 50 → 26 nodes, 0.0189 ETH; 52 → 31 nodes, 0.0254 ETH; 54 → 31 nodes, 0.0308 ETH (51 and 53 pending). The published scores are reproduced exactly with `nodeBond / getActiveValidatorCount()`, which confirms the mechanism.
+Per interval (every interval since megapools joined the smoothing pool):
+
+| Interval | Megapools mis-scored | NOs underpaid | Total shortfall |
+|---|---|---|---|
+| 50 | 28 / 84 | 26 | 0.0189 ETH |
+| 51 | 34 / 96 | 30 | 0.0251 ETH |
+| 52 | 35 / 97 | 31 | 0.0254 ETH |
+| 53 | 35 / 98 | 30 | 0.0325 ETH |
+| 54 | 36 / 97 | 31 | 0.0308 ETH |
+| **total** | | | **0.133 ETH** |
+
+Per-node lists are in `cache/impact-<n>.json` when you run `impact.py`. The published scores are reproduced exactly with `nodeBond / getActiveValidatorCount()`, which confirms the mechanism.
 
 This is outside Rocket Pool's Immunefi scope, which covers smart contracts only, so it can be reported publicly.
 
@@ -78,6 +95,14 @@ SP voter share.
 `smoothingPoolVoterShareEth` is the pre-rounding figure. The amounts actually allocated (leaves, and
 `userETH`/`nodeETH` in the on-chain `RewardSnapshot`) balance exactly. No funds are affected. The
 metadata just should not claim more than the pool held.
+
+## F5. Interval 46: 0.0023 ETH of SP ETH not traceable to the performance file (open)
+
+In interval 46, the first v11 interval, six nodes receive more smoothing-pool ETH than the sum of
+`ethEarned + bonusEthEarned` of their validators in the performance file: 0.00233 ETH in total.
+Five of the six own megapools, and the performance file has no `megapoolPerformance` entries for 46.
+Intervals 47–49 balance exactly once the published consensus bonus is included. This is probably
+megapool income that the performance file simply does not list, but I have not confirmed it yet.
 
 ## F4. Interval 22 (history, already public)
 

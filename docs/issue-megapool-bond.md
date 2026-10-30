@@ -23,7 +23,7 @@ So a megapool with queued validators gets a per-validator bond that is too low. 
 - 36 of 97 SP megapools were affected.
 - 31 operators were underpaid by 0.0308 ETH in total. The largest shortfall was 0.0073 ETH, for node 0xc0e7…11ac: 41 staked and 113 queued validators, scored with a 1.065 ETH bond.
 
-Small today, but it grows with the queue. It also happened in intervals 50 (26 operators, 0.019 ETH) and 52 (31 operators, 0.025 ETH). Per-interval reports: https://github.com/let-the-dreamers-rise/rp-treecheck/tree/main/reports
+Small today, but it grows with the queue. It has happened in every interval since megapools joined the smoothing pool: 50 (26 operators, 0.019 ETH), 51 (30, 0.025), 52 (31, 0.025), 53 (30, 0.033) and 54. That is 0.133 ETH in total so far. Per-interval reports: https://github.com/let-the-dreamers-rise/rp-treecheck/tree/main/reports
 
 **Suggested fix**
 Normalise by the validators that have been assigned funds and have not exited or been dissolved. Equivalently, exclude `inQueue` from the count. That matches how the contract computes its own capital ratio (`nodeBond` vs `userCapital`).

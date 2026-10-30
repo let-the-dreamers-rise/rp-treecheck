@@ -103,7 +103,10 @@ def check_sp(rf, pf, snap):
     tno = SP * S // (A * ETH)
     earned_ok = all(tno * int(v["attestationScore"]) // S == int(v["ethEarned"]) for v in allv)
     out.append(("L5 per-validator SP ETH from scores", earned_ok, f"{len(allv)} validators"))
-    out.append(("L5 NO SP ETH total", sum(tno * int(v["attestationScore"]) // S for v in allv) == int(t["nodeOperatorSmoothingPoolEth"]), ""))
+    # v11 intervals 46-49 also pay the v10 consensus bonus; it is taken from the file, not recomputed
+    bonus = sum(int(v.get("bonusEthEarned", 0)) for v in allv)
+    got = sum(tno * int(v["attestationScore"]) // S for v in allv) + bonus
+    out.append(("L5 NO SP ETH total (attestations + published bonus)", got == int(t["nodeOperatorSmoothingPoolEth"]), f"{got} vs {t['nodeOperatorSmoothingPoolEth']}, bonus {bonus}"))
     if mvs:
         byaddr = {n["megapool"].lower(): n for n in snap["nodes"].values() if n.get("megapoolInfo")}
         f_no, f_v = 5 * ETH // 100, 9 * ETH // 100  # TODO read time-weighted split from RocketNetworkRevenues
