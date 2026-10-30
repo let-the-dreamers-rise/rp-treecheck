@@ -29,7 +29,7 @@ Small today, but it grows with the queue. It also happened in intervals 50 (26 o
 Normalise by the validators that have been assigned funds and have not exited or been dissolved. Equivalently, exclude `inQueue` from the count. That matches how the contract computes its own capital ratio (`nodeBond` vs `userCapital`).
 
 **Reproduce**
-[rp-treecheck](https://github.com/let-the-dreamers-rise/rp-treecheck) recomputes this from public data. `python -m rptc.verify 54 …` prints the affected megapools.
+[rp-treecheck](https://github.com/let-the-dreamers-rise/rp-treecheck) recomputes this from public data. `python -m rptc.run 54` prints the affected megapools.
 
 Happy to help test a fix against the next tree.
 
